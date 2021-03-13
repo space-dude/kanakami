@@ -890,6 +890,7 @@ public class Game implements Runnable, KeyListener {
 		case STUDYKATAKANA:
 		case STUDYHIRAGANA:
 			if(!isQuiz) {
+				boolean quizImmediately = true;
 
 				//Right Arrow Key
 				if(e.getKeyCode() == 39) {
@@ -902,7 +903,7 @@ public class Game implements Runnable, KeyListener {
 						else
 							currentKanaIndex = 0;
 
-						if(quizOn && rndm.nextInt(30) == 5) {
+						if(quizOn && (quizImmediately || rndm.nextInt(30) == 5)) {
 							isQuiz = true;
 							quizSetUp = true;
 						}
@@ -915,7 +916,7 @@ public class Game implements Runnable, KeyListener {
 						else
 							currentKanaIndex = 0;
 
-						if(quizOn && rndm.nextInt(30) == 5) {
+						if(quizOn && (quizImmediately || rndm.nextInt(30) == 5)) {
 							isQuiz = true;
 							quizSetUp = true;
 						}
