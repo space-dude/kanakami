@@ -156,7 +156,7 @@ public class Game implements Runnable, KeyListener {
 
 
 	public Game() {
-		frame = new JFrame("KanaKami (Ç©Ç»ê_)");
+		frame = new JFrame("KanaKami (Ç©Ç»?_)");
 
 		panel = (JPanel) frame.getContentPane();
 		panel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
