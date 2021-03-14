@@ -157,8 +157,20 @@ public class Deck extends ArrayList<Card> {
 		return this.deckSize;
 	}
 	
-	public Card getCard(int index) { // (To DO Later) Need to code for proper indexing
-		return deckOfCards.get(index);
+	public Card getCard(int index) {
+		// TODO: Need to code for proper indexing
+		if (deckOfCards.size() >= this.size()) {
+			if (index < deckOfCards.size())
+				return deckOfCards.get(index);
+			else
+				return null;
+		} else {
+			// System.out.println("deckOfCards.size(): " + deckOfCards.size() + ", deck.size(): " + this.size());
+			if (index < size())
+				return get(index);
+			else
+				return null;
+		}
 	}
 	
 	public String getName() {

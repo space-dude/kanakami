@@ -8,13 +8,16 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -34,9 +37,9 @@ import javax.swing.JPanel;
  * Lucky Star (c) Kagami YOSHIMIZU
  *
  * To Be Implemented:
- * 	Add Dakuten and Handakuden for Hiragana
- * 	Add Katakana
- * 	Add Reference Charts
+ * 	Resolve issue deck usage is inconsistent with getCard() method - currently temporary workaround
+ * 	Resolve issue crashing after enabling Dakuten / Handakuden - currently temporary workaround
+ * 	(Later) Add Reference Charts
  * 
  * 	(Done)Change Quiz to be able to activate both Hiragana and Katakana using if else
  * 	NEED to change currentKanaIndex to know if Dakuten is on or off to view cards
@@ -59,7 +62,8 @@ public class Game implements Runnable, KeyListener {
 
 	private Font font = new Font("kanaRomanjiFont", Font.BOLD, 58);
 
-	private final String[] romanjiStrings = {"a", "i", "u", "e", "o",
+	private final String[] romanjiStrings = {
+			"a", "i", "u", "e", "o",
 			"ka", "ki", "ku", "ke", "ko",
 			"sa", "shi", "su", "se", "so",
 			"ta", "chi", "tsu", "te", "to",
@@ -72,7 +76,7 @@ public class Game implements Runnable, KeyListener {
 			"n",
 			"ga", "gi", "gu", "ge", "go",
 			"za", "ji", "zu", "ze", "zo",
-			"da", "ji", "ji", "de", "do",
+			"da", "ji", "zu", "de", "do",
 			"ba", "bi", "bu", "be", "bo",
 			"pa", "pi", "pu", "pe", "po"};
 
@@ -112,6 +116,8 @@ public class Game implements Runnable, KeyListener {
 	private int locationCorrectAnswers = 0;
 	private int quizPositionCount = 1;
 	private int quizCurserLocation = 50;
+	private HashMap<Card, Integer> hiraganaFailures = new HashMap<Card, Integer>();
+	private HashMap<Card, Integer> katakanaFailures = new HashMap<Card, Integer>();
 
 	private int mainMenuPositionCount = 1;
 	private int mainMenuCurserLocationWidth = 60;
@@ -322,9 +328,9 @@ public class Game implements Runnable, KeyListener {
 
 		   hiraganaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/hiraganaDa.png" );
 
-		   hiraganaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/hiraganaTJi.png" );
-
 		   hiraganaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/hiraganaTJi2.png" );
+
+		   hiraganaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/hiraganaZu2.png" );
 
 		   hiraganaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/hiraganaDe.png" );
 
@@ -456,6 +462,65 @@ public class Game implements Runnable, KeyListener {
 			Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
+		/**
+		 * DAKUTEN
+		 */
+		indexDakuten = 0;
+		try {
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaGa.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaGi.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaGu.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaGe.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaGo.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaZa.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaJi.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaZu.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaZe.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaZo.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaDa.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaTJi2.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaZu2.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaDe.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaDo.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaBa.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaBi.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaBu.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaBe.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaBo.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaPa.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaPi.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaPu.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaPe.png" );
+
+			   katakanaDakuten[indexDakuten++] = Utils.getInstance().getBufferedImage( "kana/resources/images/katakanaPo.png" );
+
+	   } catch (Exception ex) {
+    	   Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+       }
 	}
 
 	private void InitializeKanaCard() {
@@ -464,13 +529,18 @@ public class Game implements Runnable, KeyListener {
 			hiraganaCardInit[i] = new Card(hiraganaKana[i], romanjiStrings[i], i);
 		}
 
-		for(int i = hiraganaCardInit.length, j = 0; i < hiraganaDakutenCardInit.length + hiraganaCardInit.length-1; i++, j++) {
+		for(int i = hiraganaCardInit.length, j = 0; i < hiraganaDakutenCardInit.length + hiraganaCardInit.length; i++, j++) {
 			hiraganaDakutenCardInit[j] = new Card(hiraganaDakuten[j], romanjiStrings[i], i);
 		}
 
 		for(int i = 0; i < katakanaCardInit.length; i++) {
 			katakanaCardInit[i] = new Card(katakanaKana[i], romanjiStrings[i], i);
 		}
+		
+		for(int i = katakanaCardInit.length, j = 0; i < katakanaDakutenCardInit.length + katakanaCardInit.length; i++, j++) {
+			katakanaDakutenCardInit[j] = new Card(katakanaDakuten[j], romanjiStrings[i], i);
+		}
+
 	}
 
 	private void InitializeKanaDeck() {
@@ -478,16 +548,31 @@ public class Game implements Runnable, KeyListener {
 		for(int i = 0; i < hiraganaCardInit.length; i++) {
 			hiraganaDeck.addCard(hiraganaCardInit[i]);
 			sortedHiraganaDeck.addCard(hiraganaCardInit[i]);
+			if (!hiraganaFailures.containsKey(hiraganaCardInit[i])) {
+				hiraganaFailures.put(hiraganaCardInit[i], 0);
+			}
 		}
 		
-		//TESTING
 		for(int i = 0; i < hiraganaDakutenCardInit.length; i++) {
-			hiraganaDeck.addCard(hiraganaCardInit[i]);
+			hiraganaDeck.addCard(hiraganaDakutenCardInit[i]);
+			if (!hiraganaFailures.containsKey(hiraganaDakutenCardInit[i])) {
+				hiraganaFailures.put(hiraganaDakutenCardInit[i], 0);
+			}
 		}
 
 		for(int i = 0; i < katakanaCardInit.length; i++) {
 			katakanaDeck.add(katakanaCardInit[i]);
 			sortedKatakanaDeck.addCard(katakanaCardInit[i]);
+			if (!katakanaFailures.containsKey(katakanaCardInit[i])) {
+				katakanaFailures.put(katakanaCardInit[i], 0);
+			}
+		}
+		
+		for(int i = 0; i < katakanaDakutenCardInit.length; i++) {
+			katakanaDeck.addCard(katakanaDakutenCardInit[i]);
+			if (!katakanaFailures.containsKey(katakanaDakutenCardInit[i])) {
+				katakanaFailures.put(katakanaDakutenCardInit[i], 0);
+			}
 		}
 	}
 
@@ -568,23 +653,25 @@ public class Game implements Runnable, KeyListener {
 	}
 
 	private void toHiraganaStudy() {
-		gameState = GameState.STUDYHIRAGANA;	   	   
+		gameState = GameState.STUDYHIRAGANA;
+		currentKanaIndex=0;
 	}
 
 	private void toKatakanaStudy() {
 		gameState = GameState.STUDYKATAKANA;
+		currentKanaIndex=0;
 	}
 
 	private void dakutenOn() {
 		isDakuten = true;
-		System.out.println(hiraganaDeck.getSize());
+//		System.out.println("Before dakutenOn hiraganaDeck.getSize(): " + hiraganaDeck.getSize());
+//		System.out.println("Before dakutenOn katakanaDeck.getSize(): " + katakanaDeck.getSize());
 		for(int i = 0; i < hiraganaDakutenCardInit.length; i++) {
 			hiraganaDeck.add(hiraganaDakutenCardInit[i]);
-			System.out.println(hiraganaDeck.getSize());
-			//katakanaDeck.add(katakanaDakutenCardInit[i]);
+			katakanaDeck.add(katakanaDakutenCardInit[i]);
 		}
-		
-		System.out.println(hiraganaDeck.getSize());
+//		System.out.println("After dakutenOn hiraganaDeck.getSize(): " + hiraganaDeck.getSize());
+//		System.out.println("After dakutenOn katakanaDeck.getSize(): " + katakanaDeck.getSize());
 
 		if(isShuffled) {
 			if(gameState == GameState.STUDYHIRAGANA)
@@ -604,10 +691,14 @@ public class Game implements Runnable, KeyListener {
 
 	private void dakutenOff() {
 		isDakuten = false;
+//		System.out.println("Before dakutenOff hiraganaDeck.getSize(): " + hiraganaDeck.getSize());
+//		System.out.println("Before dakutenOff katakanaDeck.getSize(): " + katakanaDeck.getSize());
 		for(int i = 0; i < hiraganaDakutenCardInit.length; i++) {
 			hiraganaDeck.remove(hiraganaDakutenCardInit[i]);
 			katakanaDeck.remove(katakanaDakutenCardInit[i]);
 		}
+//		System.out.println("After dakutenOff hiraganaDeck.getSize(): " + hiraganaDeck.getSize());
+//		System.out.println("After dakutenOff katakanaDeck.getSize(): " + katakanaDeck.getSize());
 		
 		if(isShuffled) {
 			if(gameState == GameState.STUDYHIRAGANA)
@@ -703,23 +794,23 @@ public class Game implements Runnable, KeyListener {
 		
 		if(!isDakuten) {
 
-			falseCardIndex1 = rndm.nextInt(45);
+			falseCardIndex1 = rndm.nextInt(46);
 			while(falseCardIndex1 == kanaQuizCards[quizCardIndex])
-				falseCardIndex1 = rndm.nextInt(45);
-			falseCardIndex2 = rndm.nextInt(45);
+				falseCardIndex1 = rndm.nextInt(46);
+			falseCardIndex2 = rndm.nextInt(46);
 			while(falseCardIndex2 == kanaQuizCards[quizCardIndex] || falseCardIndex2 == falseCardIndex1)
-				falseCardIndex2 = rndm.nextInt(45);
+				falseCardIndex2 = rndm.nextInt(46);
 
 		}
 		
 		else {
 			
-			falseCardIndex1 = rndm.nextInt(45 + 25);
+			falseCardIndex1 = rndm.nextInt(46 + 25);
 			while(falseCardIndex1 == kanaQuizCards[quizCardIndex])
-				falseCardIndex1 = rndm.nextInt(45 + 25);
-			falseCardIndex2 = rndm.nextInt(45 + 25);
+				falseCardIndex1 = rndm.nextInt(46 + 25);
+			falseCardIndex2 = rndm.nextInt(46 + 25);
 			while(falseCardIndex2 == kanaQuizCards[quizCardIndex] || falseCardIndex2 == falseCardIndex1)
-				falseCardIndex2 = rndm.nextInt(45 + 25);
+				falseCardIndex2 = rndm.nextInt(46 + 25);
 
 		}
 
@@ -756,15 +847,47 @@ public class Game implements Runnable, KeyListener {
 		case STUDYKATAKANA:
 		case STUDYHIRAGANA:
 			if(quizOn && isQuiz && quizSetUp) {
-				if(gameState == GameState.STUDYHIRAGANA)
+				HashMap<Card, Integer> currentFailures = null;
+				Deck deck = null;
+				if(gameState == GameState.STUDYHIRAGANA) {
 					gameState = GameState.QUIZHIRAGANA;
-				else
-					gameState = GameState.QUIZKATAKANA;
-				for(int i = 0; i < 5; i++) {
-					kanaQuizCards[i] = rndm.nextInt(45);
+					currentFailures = hiraganaFailures;
+					deck = hiraganaDeck;
 				}
+				else {
+					gameState = GameState.QUIZKATAKANA;
+					currentFailures = katakanaFailures;
+					deck = katakanaDeck;
+				}
+				
+				List<Map.Entry<Card, Integer>> list = new ArrayList(currentFailures.entrySet());
+			    Collections.sort(list, new Comparator<Map.Entry<Card, Integer>>() {
+			        @Override
+			        public int compare(Map.Entry<Card, Integer> e1, Map.Entry<Card, Integer> e2) {
+			            return -e1.getValue().compareTo(e2.getValue());
+			        }
+			    });
+				
+				for(int i = 0; i < 5; i++) {
+					boolean found = false;
+					Map.Entry<Card, Integer> entry = list.get(i);
+					if (entry.getValue()!=0) {
+						Card card = entry.getKey();
+						for (int j = 0; j < deck.getSize(); j++) {
+							if (deck.getCard(j) == card) {
+								kanaQuizCards[i] = j;
+								found = true;
+								break;
+							}
+						}
+					}
+					if (!found)
+						kanaQuizCards[i] = rndm.nextInt(46);
+//					System.out.println("Quiz [" + i + "]=" + deck.getCard(kanaQuizCards[i]));
+				}
+//				System.out.println("----");
 
-				//set inital given answers for quiz
+				//set initial given answers for quiz
 				setQuizAnswers();
 
 				quizSetUp = false;
@@ -784,6 +907,7 @@ public class Game implements Runnable, KeyListener {
 	 */
 	protected void render(Graphics2D g) {
 
+		Card card;
 		switch (gameState)
 		{
 		case MAINMENU:
@@ -794,37 +918,66 @@ public class Game implements Runnable, KeyListener {
 			g.drawImage(menuSelectImg, mainMenuCurserLocationWidth, mainMenuCurserLocationHeight, menuSelectImg.getWidth(), menuSelectImg.getHeight(), null);
 			break;
 		case STUDYHIRAGANA:
+			card = hiraganaDeck.getCard(currentKanaIndex);
 			g.drawImage(kanaKamiLayout, 0, 0, WIDTH, HEIGHT, null);//for some reason the right side and bottom side has a blank border
-			g.drawImage(hiraganaDeck.getCard(currentKanaIndex).getKana(), WIDTH/3 + 30, HEIGHT/5, hiraganaDeck.getCard(currentKanaIndex).getKana().getWidth(), hiraganaDeck.getCard(currentKanaIndex).getKana().getHeight(), null);
-			g.drawString(hiraganaDeck.getCard(currentKanaIndex).getRomanji(), WIDTH/2 - 50, HEIGHT/2 + 15);
+			if (card != null) {
+				g.drawImage(card.getKana(), WIDTH/3 + 30, HEIGHT/5, card.getKana().getWidth(), card.getKana().getHeight(), null);
+				g.drawString(card.getRomanji(), WIDTH/2 - 50, HEIGHT/2 + 15);
+			} else {
+				Logger.getLogger(Game.class.getName()).log(Level.SEVERE, "Reset invalid currentKanaIndex: " + currentKanaIndex, (Exception) null);
+				currentKanaIndex = 0;
+				card = hiraganaDeck.getCard(currentKanaIndex);
+				g.drawImage(card.getKana(), WIDTH/3 + 30, HEIGHT/5, card.getKana().getWidth(), card.getKana().getHeight(), null);
+				g.drawString(card.getRomanji(), WIDTH/2 - 50, HEIGHT/2 + 15);
+			}
 			g.drawImage(currentSortStatusImg, 590, 4, currentSortStatusImg.getWidth(), currentSortStatusImg.getHeight(), null);
 			g.drawImage(currentQuizStatusImg, 5, 4, currentQuizStatusImg.getWidth(), currentQuizStatusImg.getHeight(), null);
 			g.drawImage(currentDakutenImg, 270, 4, currentDakutenImg.getWidth(), currentDakutenImg.getHeight(), null);
 			break;
 		case STUDYKATAKANA:
+			card = katakanaDeck.getCard(currentKanaIndex);
 			g.drawImage(kanaKamiLayout, 0, 0, WIDTH, HEIGHT, null);//for some reason the right side and bottom side has a blank border
-			//System.out.println("Current Index = " + currentKanaIndex);
-			//g.drawImage(hiraganaDeck.getCard(currentKanaIndex).getKana(), WIDTH/3 + 30, HEIGHT/5, hiraganaDeck.getCard(currentKanaIndex).getKana().getWidth(), hiraganaDeck.getCard(currentKanaIndex).getKana().getHeight(), null);
-			//g.drawString(katakanaDeck.getCard(currentKanaIndex).getRomanji(), WIDTH/2 - 50, HEIGHT/2 + 15);
+			if (card != null) {
+				g.drawImage(card.getKana(), WIDTH/3 + 30, HEIGHT/5, card.getKana().getWidth(), card.getKana().getHeight(), null);
+				g.drawString(card.getRomanji(), WIDTH/2 - 50, HEIGHT/2 + 15);
+			} else {
+				Logger.getLogger(Game.class.getName()).log(Level.SEVERE, "Reset invalid currentKanaIndex: " + currentKanaIndex, (Exception) null);
+				currentKanaIndex = 0;
+				card = katakanaDeck.getCard(currentKanaIndex);
+				g.drawImage(card.getKana(), WIDTH/3 + 30, HEIGHT/5, card.getKana().getWidth(), card.getKana().getHeight(), null);
+				g.drawString(card.getRomanji(), WIDTH/2 - 50, HEIGHT/2 + 15);
+			}
 			g.drawImage(currentSortStatusImg, 590, 4, currentSortStatusImg.getWidth(), currentSortStatusImg.getHeight(), null);
 			g.drawImage(currentQuizStatusImg, 5, 4, currentQuizStatusImg.getWidth(), currentQuizStatusImg.getHeight(), null);
 			g.drawImage(currentDakutenImg, 270, 4, currentDakutenImg.getWidth(), currentDakutenImg.getHeight(), null);
 			break;
 		case QUIZHIRAGANA:
-			g.drawImage(kanaKamiQuizLayout, 0, 0, WIDTH, HEIGHT, null);
-			g.drawImage(hiraganaDeck.getCard(kanaQuizCards[quizCardIndex]).getKana(), WIDTH/3 + 30, HEIGHT/10 - 20, hiraganaDeck.getCard(kanaQuizCards[quizCardIndex]).getKana().getWidth(), hiraganaDeck.getCard(kanaQuizCards[quizCardIndex]).getKana().getHeight(), null);
-			g.drawString(hiraganaDeck.getCard(falseCardIndex1).getRomanji(), positionAnswers1, HEIGHT/3 + 50);
-			g.drawString(hiraganaDeck.getCard(kanaQuizCards[quizCardIndex]).getRomanji(), positionAnswers2, HEIGHT/3 + 50);
-			g.drawString(hiraganaDeck.getCard(falseCardIndex2).getRomanji(), positionAnswers3, HEIGHT/3 + 50);
-			g.drawImage(quizSelectImg, quizCurserLocation, HEIGHT/3 - 20, quizSelectImg.getWidth(), quizSelectImg.getHeight(), null);
+			try {
+				card = hiraganaDeck.getCard(kanaQuizCards[quizCardIndex]);
+				g.drawImage(kanaKamiQuizLayout, 0, 0, WIDTH, HEIGHT, null);
+				g.drawImage(card.getKana(), WIDTH / 3 + 30, HEIGHT / 10 - 20, card.getKana().getWidth(), card.getKana().getHeight(), null);
+				g.drawString(hiraganaDeck.getCard(falseCardIndex1).getRomanji(), positionAnswers1, HEIGHT / 3 + 50);
+				g.drawString(card.getRomanji(), positionAnswers2, HEIGHT / 3 + 50);
+				g.drawString(hiraganaDeck.getCard(falseCardIndex2).getRomanji(), positionAnswers3, HEIGHT / 3 + 50);
+				g.drawImage(quizSelectImg, quizCurserLocation, HEIGHT / 3 - 20, quizSelectImg.getWidth(), quizSelectImg.getHeight(), null);
+			} catch (Exception e) {
+				Logger.getLogger(Game.class.getName()).log(Level.SEVERE, "Reset invalid quizCardIndex: " + quizCardIndex, (Exception) null);
+				this.isQuiz = false;
+			}
 			break;
 		case QUIZKATAKANA:
-			g.drawImage(kanaKamiQuizLayout, 0, 0, WIDTH, HEIGHT, null);
-			g.drawImage(katakanaDeck.getCard(kanaQuizCards[quizCardIndex]).getKana(), WIDTH/3 + 30, HEIGHT/10 - 20, katakanaDeck.getCard(kanaQuizCards[quizCardIndex]).getKana().getWidth(), katakanaDeck.getCard(kanaQuizCards[quizCardIndex]).getKana().getHeight(), null);
-			g.drawString(katakanaDeck.getCard(falseCardIndex1).getRomanji(), positionAnswers1, HEIGHT/3 + 50);
-			g.drawString(katakanaDeck.getCard(kanaQuizCards[quizCardIndex]).getRomanji(), positionAnswers2, HEIGHT/3 + 50);
-			g.drawString(katakanaDeck.getCard(falseCardIndex2).getRomanji(), positionAnswers3, HEIGHT/3 + 50);
-			g.drawImage(quizSelectImg, quizCurserLocation, HEIGHT/3 - 20, quizSelectImg.getWidth(), quizSelectImg.getHeight(), null);
+			try {
+				card = katakanaDeck.getCard(kanaQuizCards[quizCardIndex]);
+				g.drawImage(kanaKamiQuizLayout, 0, 0, WIDTH, HEIGHT, null);
+				g.drawImage(card.getKana(), WIDTH/3 + 30, HEIGHT/10 - 20, card.getKana().getWidth(), card.getKana().getHeight(), null);
+				g.drawString(katakanaDeck.getCard(falseCardIndex1).getRomanji(), positionAnswers1, HEIGHT/3 + 50);
+				g.drawString(card.getRomanji(), positionAnswers2, HEIGHT/3 + 50);
+				g.drawString(katakanaDeck.getCard(falseCardIndex2).getRomanji(), positionAnswers3, HEIGHT/3 + 50);
+				g.drawImage(quizSelectImg, quizCurserLocation, HEIGHT/3 - 20, quizSelectImg.getWidth(), quizSelectImg.getHeight(), null);
+			} catch (Exception e) {
+				Logger.getLogger(Game.class.getName()).log(Level.SEVERE, "Reset invalid quizCardIndex: " + quizCardIndex, (Exception) null);
+				this.isQuiz = false;
+			}
 			break;
 		case CHART:
 			break;
@@ -898,7 +1051,7 @@ public class Game implements Runnable, KeyListener {
 					// If not isDakuten
 					if(!isDakuten) {
 
-						if(currentKanaIndex < 45)
+						if(currentKanaIndex < 45   )
 							currentKanaIndex++;
 						else
 							currentKanaIndex = 0;
@@ -1040,7 +1193,28 @@ public class Game implements Runnable, KeyListener {
 
 			//Enter Key
 			else if(e.getKeyCode() == 10) {
+				Card currentCard = null;
+				HashMap<Card, Integer> currentFailures = null;
+				switch (gameState) {
+				case QUIZKATAKANA:
+					currentCard =  katakanaDeck.getCard(kanaQuizCards[quizCardIndex]);
+					currentFailures = katakanaFailures;
+					break;
+				case QUIZHIRAGANA:
+					currentCard =  hiraganaDeck.getCard(kanaQuizCards[quizCardIndex]);
+					currentFailures = hiraganaFailures;
+					break;
+				}
+				int failures = 0;
+				if (currentFailures.containsKey(currentCard)) {
+					failures=currentFailures.get(currentCard);
+				}
 				if(quizPositionCount == locationCorrectAnswers) {
+					failures--;
+					if (failures==0)
+						failures = -1;
+					currentFailures.put(currentCard, failures);
+					
 					playSound("Good Job!.wav");
 					quizPositionCount = 1;
 					quizCurserLocation = 50;
@@ -1053,14 +1227,19 @@ public class Game implements Runnable, KeyListener {
 							gameState = GameState.STUDYHIRAGANA;
 						else
 							gameState = GameState.STUDYKATAKANA;
+					} else {
+						// Next question
+						quizCardIndex++;
+						setQuizAnswers();
 					}
-
-					//Next question
-					quizCardIndex++;
-					setQuizAnswers();
 				}
 
 				else {
+					failures++;
+					if (failures==0)
+						failures = 1;
+					currentFailures.put(currentCard, failures);
+
 					//playSound("BuBu Noise.wav");	//Need to normalize sounds
 				}
 			}
